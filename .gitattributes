@@ -1,0 +1,4 @@
+# Customise GitHub Linguist
+
+# Include Markdown files in stats
+*.md linguist-detectable
