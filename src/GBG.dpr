@@ -5,13 +5,17 @@ program GBG;
 {$R *.res}
 
 uses
-  System.SysUtils;
+  System.SysUtils,
+  GBG.Main in 'GBG.Main.pas';
 
 begin
   {$IFDEF DEBUG}
   ReportMemoryLeaksOnShutdown := True;
   {$ENDIF}
   try
+
+    TMain.Run;
+
     {$IF Defined(DEBUG) and Defined(MSWINDOWS)}
     {$WARN SYMBOL_PLATFORM OFF}
     if DebugHook <> 0 then
