@@ -1,0 +1,39 @@
+﻿; Version information description file used to create Version.res resource file
+; Build this file with DelphiDabbler Version Information Editor ~> 2.15.
+; Then build the resulting .rc file using the Borland BRCC32 resource compiler.
+
+[Macros]
+Import:version=VERSION
+
+[Fixed File Info]
+File Version #=<%version.release>
+Product Version #=<%version.release>
+File Sub-Type=0
+File OS=4
+File Type=1
+File Flags=0
+File Flags Mask=0
+
+[Variable File Info]
+Character Set=1252
+Language=2057
+
+[String File Info]
+File Description=Garbage file creator
+Product Version=Release v<%version.release><%version.suffix>
+Comments=MIT License
+Legal Copyright=Copyright © <%version.copyright-date> Peter Johnson (https://gravatar.com/delphidabbler), <COMMENTS>
+Internal Name=<SHORTFNAME>
+Company Name=DelphiDabbler
+Original File Name=GBG.exe
+Private Build=
+Product Name=<COMPANYNAME> <SHORTFNAME>
+Special Build=
+Legal Trademark=
+File Version=<%version.release>
+
+[Configuration Details]
+ResOutputDir=
+NumRCComments=0
+Identifier=
+FileVersion=2

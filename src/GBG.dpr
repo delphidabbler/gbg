@@ -3,6 +3,7 @@ program GBG;
 {$APPTYPE CONSOLE}
 
 {$R *.res}
+{$R Version.res}
 
 uses
   System.SysUtils,
