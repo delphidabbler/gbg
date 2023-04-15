@@ -150,7 +150,7 @@
         <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <AppEnableRuntimeThemes>false</AppEnableRuntimeThemes>
-        <AppDPIAwarenessMode>none</AppDPIAwarenessMode>
+        <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1)'!=''">
         <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
@@ -170,7 +170,6 @@
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win64)'!=''">
         <VerInfo_Locale>1033</VerInfo_Locale>
-        <Manifest_File>(None)</Manifest_File>
         <AppEnableRuntimeThemes>false</AppEnableRuntimeThemes>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
