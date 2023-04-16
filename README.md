@@ -70,3 +70,7 @@ To suggest new features or report bugs use the _gbg_ [Issues page](https://githu
 ## License
 
 _gbg_ is MIT licensed. See `LICENSE.md`.
+
+## Change Log
+
+Changes in each release are documentation in `CHANGELOG.md`.
