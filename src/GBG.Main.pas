@@ -92,7 +92,8 @@ end;
 class procedure TMain.CreateBuffer(out Buffer: TBytes);
 begin
   SetLength(Buffer, Min(BufSize, fFileSize));
-  FillBufferWithGarbage(Buffer);
+  if Length(Buffer) > 0 then
+    FillBufferWithGarbage(Buffer);
 end;
 
 class procedure TMain.Execute;
@@ -126,6 +127,7 @@ end;
 
 class procedure TMain.FillBufferWithGarbage(var Bytes: TBytes);
 begin
+  Assert(Length(Bytes) > 0);
   Randomize;
   for var Idx: UInt64 := 0 to Pred(Length(Bytes)) do
     Bytes[Idx] := Random(High(Byte));
