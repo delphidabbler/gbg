@@ -7,7 +7,9 @@ program GBG;
 
 uses
   System.SysUtils,
-  GBG.Main in 'GBG.Main.pas';
+  GBG.Main in 'GBG.Main.pas',
+  GBG.Generator.Base in 'GBG.Generator.Base.pas',
+  GBG.Generator.BinaryGarbage in 'GBG.Generator.BinaryGarbage.pas';
 
 begin
   {$IFDEF DEBUG}

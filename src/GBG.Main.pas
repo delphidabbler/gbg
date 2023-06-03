@@ -65,7 +65,9 @@ uses
   System.IOUtils,
   System.Classes,
   System.Math,
-  System.Character;
+  System.Character,
+  GBG.Generator.Base,
+  GBG.Generator.BinaryGarbage;
 
 { TMain }
 
@@ -128,9 +130,12 @@ end;
 class procedure TMain.FillBufferWithGarbage(var Bytes: TBytes);
 begin
   Assert(Length(Bytes) > 0);
-  Randomize;
-  for var Idx: UInt64 := 0 to Pred(Length(Bytes)) do
-    Bytes[Idx] := Random(High(Byte));
+  var Generator := TGeneratorFactory.CreateBinaryGarbage;
+  try
+    Generator.FillBuffer(Bytes);
+  finally
+    Generator.Free;
+  end;
 end;
 
 class function TMain.FreeSpaceOnFileDrive: UInt64;
