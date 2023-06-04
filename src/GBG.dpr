@@ -2,8 +2,8 @@ program GBG;
 
 {$APPTYPE CONSOLE}
 
-{$R *.res}
-{$R Version.res}
+{$Resource *.res}
+{$Resource Version.res}
 
 uses
   System.SysUtils,
