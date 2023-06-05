@@ -206,15 +206,7 @@ end;
 class procedure TMain.Initialise;
 begin
 
-  if ParamCount = 0 then
-    raise ESilent.Create('');
-
-  try
-    fParams := TParams.Create(MaxSupportedFileSize);
-  except
-    on E: EParams do
-      raise EUsageError.Create(E.Message);
-  end;
+  fParams := TParams.Create(MaxSupportedFileSize);
 
   CheckUserPermissions; // raises exceptions if user denies permissions
 

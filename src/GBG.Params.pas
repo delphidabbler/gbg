@@ -2,9 +2,6 @@ unit GBG.Params;
 
 interface
 
-uses
-  System.SysUtils;
-
 type
 
   TParams = class
@@ -23,13 +20,13 @@ type
     property FileSize: UInt64 read fFileSize;
   end;
 
-  EParams = class(Exception);
-
 implementation
 
 uses
+  System.SysUtils,
   System.Character,
 
+  GBG.Exceptions,
   GBG.NumberFmt;
 
 { TParams }
@@ -46,6 +43,8 @@ end;
 
 procedure TParams.ParseCommandLine;
 begin
+  if ParamCount = 0 then
+    raise ESilent.Create('');
   for var I := 1 to ParamCount do
   begin
     var Cmd := ParamStr(I);
@@ -54,17 +53,17 @@ begin
     else if not fIsFileSizeSet then
     begin
       if not TNumberFmt.TryParse(Cmd, fFileSize) then
-        raise EParams.CreateFmt(
+        raise EUsageError.CreateFmt(
           'Invalid file size. Must be a whole number in range 0 to %s',
           [TNumberFmt.Create(fMaxFileSize).ToString]
         );
       fIsFileSizeSet := True;
     end
     else
-      raise EParams.Create('Too many parameters');
+      raise EUsageError.Create('Too many parameters');
   end;
   if (fFileName = '') or not fIsFileSizeSet then
-    raise EParams.Create('A file name and a file size are required');
+    raise EUsageError.Create('A file name and a file size are required');
 end;
 
 end.
