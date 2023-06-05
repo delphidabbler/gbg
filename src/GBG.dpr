@@ -10,7 +10,8 @@ uses
   GBG.Main in 'GBG.Main.pas',
   GBG.Generator.Base in 'GBG.Generator.Base.pas',
   GBG.Generator.BinaryGarbage in 'GBG.Generator.BinaryGarbage.pas',
-  GBG.NumberFmt in 'GBG.NumberFmt.pas';
+  GBG.NumberFmt in 'GBG.NumberFmt.pas',
+  GBG.Params in 'GBG.Params.pas';
 
 begin
   {$IFDEF DEBUG}

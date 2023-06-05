@@ -3,7 +3,8 @@ unit GBG.Main;
 interface
 
 uses
-  System.SysUtils;
+  System.SysUtils,
+  GBG.Params;
 
 type
 
@@ -39,8 +40,7 @@ type
       MaxUnchallengedFileSize = 500 * MB;   // 500,000,000 bytes
       MaxSupportedFileSize = 20 * GiB;      // 21,474,836,480 bytes
     class var
-      fFileName: string;
-      fFileSize: UInt64;
+      fParams: TParams;
     class procedure FillBufferWithGarbage(var Bytes: TBytes);
     class procedure CreateBuffer(out Buffer: TBytes);
     class function GetConfirmation(const Question: string;
@@ -49,13 +49,12 @@ type
     class procedure HandleProgramException(const E: Exception);
     class procedure HandleExecutionException(const E: Exception);
     class function FreeSpaceOnFileDrive: UInt64;
-    class procedure ParseAndCheckParams;
-    class function ParseNumberStr(ANumStr: string): UInt64;
     class procedure Usage;
     class procedure Initialise;
     class procedure Execute;
   public
     class procedure Run;
+    class destructor Destroy;
   end;
 
 implementation
@@ -73,7 +72,7 @@ uses
 
 class procedure TMain.CheckUserPermissions;
 begin
-  if fFileSize > MaxUnchallengedFileSize  then
+  if fParams.FileSize > MaxUnchallengedFileSize  then
   begin
     if not GetConfirmation(
       Format(
@@ -84,7 +83,7 @@ begin
     ) then
       raise ECancellation.Create('Operation cancelled');
   end;
-  if TFile.Exists(fFileName) then
+  if TFile.Exists(fParams.FileName) then
   begin
     if not GetConfirmation('File already exists. Overwrite? [y/N]', 'Y') then
       raise ECancellation.Create('Operation cancelled');
@@ -93,23 +92,28 @@ end;
 
 class procedure TMain.CreateBuffer(out Buffer: TBytes);
 begin
-  SetLength(Buffer, Min(BufSize, fFileSize));
+  SetLength(Buffer, Min(BufSize, fParams.FileSize));
   if Length(Buffer) > 0 then
     FillBufferWithGarbage(Buffer);
+end;
+
+class destructor TMain.Destroy;
+begin
+  fParams.Free;
 end;
 
 class procedure TMain.Execute;
 begin
   try
-    var FS := TFileStream.Create(fFileName, fmCreate);
+    var FS := TFileStream.Create(fParams.FileName, fmCreate);
     try
-      if fFileSize = 0 then
+      if fParams.FileSize = 0 then
         Exit;
 
       var Buffer: TBytes;
       CreateBuffer(Buffer);
 
-      var BytesRemaining := fFileSize;
+      var BytesRemaining := fParams.FileSize;
       while BytesRemaining > 0 do
       begin
         var BytesToWrite: UInt64 := Min(BytesRemaining, UInt64(Length(Buffer)));
@@ -141,7 +145,7 @@ end;
 class function TMain.FreeSpaceOnFileDrive: UInt64;
 begin
   var FreeAvailable, Total, FreeTotal: Int64;
-  var Drive := TDirectory.GetDirectoryRoot(fFileName);
+  var Drive := TDirectory.GetDirectoryRoot(fParams.FileName);
   if not GetDiskFreeSpaceEx(PChar(Drive), FreeAvailable, Total, @FreeTotal) then
     raise EExecutionError.Create('Drive ' + Drive + ' not found');
   Result := UInt64(FreeAvailable)
@@ -159,8 +163,8 @@ end;
 class procedure TMain.HandleExecutionException(const E: Exception);
 begin
   try
-    if TFile.Exists(fFileName) then
-      TFile.Delete(fFileName);
+    if TFile.Exists(fParams.FileName) then
+      TFile.Delete(fParams.FileName);
   except
     // swallow exception: not relevant to main program operation
   end;
@@ -212,37 +216,20 @@ begin
   if ParamCount = 0 then
     raise ESilent.Create('');
 
-  ParseAndCheckParams;
+  try
+    fParams := TParams.Create(MaxSupportedFileSize);
+  except
+    on E: EParams do
+      raise EUsageError.Create(E.Message);
+  end;
 
   CheckUserPermissions; // raises exceptions if user denies permissions
 
-  if fFileSize > FreeSpaceOnFileDrive then
+  if fParams.FileSize > FreeSpaceOnFileDrive then
     raise EExecutionError.Create(
       'Requested file size is larger than free space on drive '
-      + TDirectory.GetDirectoryRoot(fFileName)
+      + TDirectory.GetDirectoryRoot(fParams.FileName)
     );
-end;
-
-class procedure TMain.ParseAndCheckParams;
-begin
-  fFileName := ParamStr(1);
-  var FileSizeStr: string := ParamStr(2);
-
-  if FileSizeStr = '' then
-    raise EUsageError.Create('A file size is required');
-
-  fFileSize := ParseNumberStr(FileSizeStr);
-end;
-
-class function TMain.ParseNumberStr(ANumStr: string): UInt64;
-begin
-  var NumFmt: TNumberFmt;
-  if not NumFmt.TryParse(ANumStr) then
-    raise EUsageError.CreateFmt(
-      'Invalid file size. Must be a whole number in range 0 to %s',
-      [TNumberFmt.Create(MaxSupportedFileSize).ToString]
-    );
-  Result := NumFmt.Value;
 end;
 
 class procedure TMain.Run;
@@ -274,3 +261,4 @@ begin
 end;
 
 end.
+
