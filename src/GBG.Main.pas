@@ -43,7 +43,6 @@ type
       fFileSize: UInt64;
     class procedure FillBufferWithGarbage(var Bytes: TBytes);
     class procedure CreateBuffer(out Buffer: TBytes);
-    class function NumberFormat(const AValue: UInt64): string;
     class function GetConfirmation(const Question: string;
       const TrueResponse: Char): Boolean;
     class procedure CheckUserPermissions;
@@ -67,7 +66,8 @@ uses
   System.Math,
   System.Character,
   GBG.Generator.Base,
-  GBG.Generator.BinaryGarbage;
+  GBG.Generator.BinaryGarbage,
+  GBG.NumberFmt;
 
 { TMain }
 
@@ -78,7 +78,7 @@ begin
     if not GetConfirmation(
       Format(
         'Requested size is greater than %s bytes. Continue? [y/N]',
-        [NumberFormat(MaxUnchallengedFileSize)]
+        [TNumberFmt.Create(MaxUnchallengedFileSize).ToString]
       ),
       'Y'
     ) then
@@ -223,12 +223,6 @@ begin
     );
 end;
 
-class function TMain.NumberFormat(const AValue: UInt64): string;
-begin
-  // Format using default locale for thousands separator
-  Result := Format('%.0n', [Extended(AValue)], TFormatSettings.Create);
-end;
-
 class procedure TMain.ParseAndCheckParams;
 begin
   fFileName := ParamStr(1);
@@ -241,41 +235,14 @@ begin
 end;
 
 class function TMain.ParseNumberStr(ANumStr: string): UInt64;
-
-  function CheckNumParts(const Parts: array of string): Boolean;
-  begin
-    if Length(Parts) = 0 then
-      Exit(False);
-    if not (Length(Parts[0]) in [1..3]) then
-      Exit(False);
-    for var Idx := 1 to Pred(Length(Parts)) do
-    begin
-      if Length(Parts[Idx]) <> 3 then
-        Exit(False);
-    end;
-    Result := True;
-  end;
-
-  function TryParseNumberStr(ANumStr: string; out ANum: UInt64): Boolean;
-  begin
-    var Fmt := TFormatSettings.Create;
-    if ANumStr.Contains(Fmt.ThousandSeparator) then
-    begin
-      // Number has thousands separate, check format and strip separators
-      var NumStrParts := ANumStr.Split([Fmt.ThousandSeparator]);
-      if not CheckNumParts(NumStrParts) then
-        Exit(False);
-      ANumStr := string.Join('', NumStrParts);
-    end;
-    Result := TryStrToUInt64(ANumStr, ANum);
-  end;
-
 begin
-  if not TryParseNumberStr(ANumStr, Result) then
+  var NumFmt: TNumberFmt;
+  if not NumFmt.TryParse(ANumStr) then
     raise EUsageError.CreateFmt(
       'Invalid file size. Must be a whole number in range 0 to %s',
-      [NumberFormat(MaxSupportedFileSize)]
+      [TNumberFmt.Create(MaxSupportedFileSize).ToString]
     );
+  Result := NumFmt.Value;
 end;
 
 class procedure TMain.Run;
@@ -301,7 +268,7 @@ begin
   Writeln(
     Format(
       '    size = size of file to generate (0..%s)',
-      [NumberFormat(MaxSupportedFileSize)]
+      [TNumberFmt.Create(MaxSupportedFileSize).ToString]
     )
   );
 end;

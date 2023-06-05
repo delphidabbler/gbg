@@ -203,6 +203,7 @@ $(PreBuildEvent)]]></PreBuildEvent>
         <DCCReference Include="GBG.Main.pas"/>
         <DCCReference Include="GBG.Generator.Base.pas"/>
         <DCCReference Include="GBG.Generator.BinaryGarbage.pas"/>
+        <DCCReference Include="GBG.NumberFmt.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
