@@ -8,14 +8,6 @@ uses
 
 type
 
-  EUsageError = class(Exception);
-
-  ECancellation = class(Exception);
-
-  EExecutionError = class(Exception);
-
-  ESilent = class(Exception);
-
   TExitCode = record
   public
     const
@@ -64,6 +56,7 @@ uses
   System.Classes,
   System.Math,
   System.Character,
+  GBG.Exceptions,
   GBG.Generator.Base,
   GBG.Generator.BinaryGarbage,
   GBG.NumberFmt;
