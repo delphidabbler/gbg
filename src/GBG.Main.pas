@@ -127,7 +127,7 @@ end;
 class procedure TMain.FillBufferWithGarbage(var Bytes: TBytes);
 begin
   Assert(Length(Bytes) > 0);
-  var Generator := TGeneratorFactory.CreateBinaryGarbage;
+  var Generator := TGeneratorFactory.CreateInstance(fParams.GeneratorType);
   try
     Generator.FillBuffer(Bytes);
   finally
@@ -233,16 +233,20 @@ class procedure TMain.Usage;
 begin
   Writeln('Usage:');
   Writeln;
-  Writeln('  gbg filename size');
+  Writeln('  gbg filename size [options]');
   Writeln;
-  Writeln('  where:');
+  Writeln('  Where:');
   Writeln('    filename = name of file to create');
   Writeln(
     Format(
-      '    size = size of file to generate (0..%s)',
+      '    size = size of file to create (0..%s)',
       [TNumberFmt.Create(MaxSupportedFileSize).ToString]
     )
   );
+  WriteLn('    options = -a');
+  WriteLn('      -a -> generate printable ASCII characters (code 32..126)');
+  WriteLn;
+  WriteLn('  Note: /a is equivalent to -a');
 end;
 
 end.

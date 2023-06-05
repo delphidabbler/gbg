@@ -206,6 +206,8 @@ $(PreBuildEvent)]]></PreBuildEvent>
         <DCCReference Include="GBG.NumberFmt.pas"/>
         <DCCReference Include="GBG.Params.pas"/>
         <DCCReference Include="GBG.Exceptions.pas"/>
+        <DCCReference Include="GBG.Types.pas"/>
+        <DCCReference Include="GBG.Generator.PrintableASCIIGarbage.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

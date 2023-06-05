@@ -12,7 +12,9 @@ uses
   GBG.Generator.BinaryGarbage in 'GBG.Generator.BinaryGarbage.pas',
   GBG.NumberFmt in 'GBG.NumberFmt.pas',
   GBG.Params in 'GBG.Params.pas',
-  GBG.Exceptions in 'GBG.Exceptions.pas';
+  GBG.Exceptions in 'GBG.Exceptions.pas',
+  GBG.Types in 'GBG.Types.pas',
+  GBG.Generator.PrintableASCIIGarbage in 'GBG.Generator.PrintableASCIIGarbage.pas';
 
 begin
   {$IFDEF DEBUG}

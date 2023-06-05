@@ -3,7 +3,8 @@ unit GBG.Generator.Base;
 interface
 
 uses
-  System.SysUtils;
+  System.SysUtils,
+  GBG.Types;
 
 type
   TBaseGenerator = class abstract
@@ -13,19 +14,29 @@ type
 
   TGeneratorFactory = class sealed
   public
-    class function CreateBinaryGarbage: TBaseGenerator;
+    class function CreateInstance(const AGenType: TGeneratorType):
+      TBaseGenerator;
   end;
 
 implementation
 
 uses
-  GBG.Generator.BinaryGarbage;
+  GBG.Generator.BinaryGarbage,
+  GBG.Generator.PrintableASCIIGarbage;
+
+type
+  TGeneratorClass = class of TBaseGenerator;
 
 { TGeneratorFactory }
 
-class function TGeneratorFactory.CreateBinaryGarbage: TBaseGenerator;
+class function TGeneratorFactory.CreateInstance(
+  const AGenType: TGeneratorType): TBaseGenerator;
+const
+  GenClasses: array[TGeneratorType] of TGeneratorClass = (
+    TBinaryGarbageGenerator, TPrintableASCIIGarbageGenerator
+  );
 begin
-  Result := TBinaryGarbageGenerator.Create;
+  Result := GenClasses[AGenType].Create;
 end;
 
 end.
