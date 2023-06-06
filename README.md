@@ -4,18 +4,27 @@ A Windows command line program to create a file of a given size, filled with ***
 
 ## Usage
 
-    gbg <filepath> <size>
+    gbg <filepath> <size> [options]
+    gbg -V
+    gbg
 
 where
 
 * `<filepath>` is the path of the file to be created. If a full path is not provided then the file is created relative to the current directory.
+
 * `<size>` is the size of the file to be created. Supported sizes are 0 to 21,474,836,480 bytes (2GiB). Sizes must be entered in bytes as a decimal number, optionally including thousands separators.
 
-Entering
+* `[options]` is zero or more of:
 
-    gbg
+    * `-a` -- Generate random printable ASCII characters with code in range 32 to 126. Do not use with `-A`.
 
-on its own displays brief usage information.
+    * `-A` -- Generate random ASCII characters, including control codes, in range 0 to 127. Do not use with `-a`.
+
+* `-V` on its own causes the program to display version information and exit
+
+* Providing no parameters cause the program to display brief usage information and exit.
+
+Note that `-` can be replaced by `/` in options. E.g. `-a` can be specified as `/a` and `-V` can be specified as `/V`.
 
 ## Operation
 
