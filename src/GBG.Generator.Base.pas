@@ -22,7 +22,7 @@ implementation
 
 uses
   GBG.Generator.BinaryGarbage,
-  GBG.Generator.PrintableASCIIGarbage;
+  GBG.Generator.ASCIIGarbage;
 
 type
   TGeneratorClass = class of TBaseGenerator;

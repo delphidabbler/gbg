@@ -1,4 +1,4 @@
-unit GBG.Generator.PrintableASCIIGarbage;
+unit GBG.Generator.ASCIIGarbage;
 
 interface
 
