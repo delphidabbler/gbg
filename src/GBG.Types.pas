@@ -6,7 +6,8 @@ type
 
   TGeneratorType = (
     Binary,
-    PrintableASCII
+    PrintableASCII,
+    ASCII
   );
 
 implementation

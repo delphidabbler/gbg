@@ -243,10 +243,11 @@ begin
       [TNumberFmt.Create(MaxSupportedFileSize).ToString]
     )
   );
-  WriteLn('    options = -a');
+  WriteLn('    options = -a | -A');
   WriteLn('      -a -> generate printable ASCII characters (code 32..126)');
+  WriteLn('      -A -> generate all ASCII characters (code 0..127)');
   WriteLn;
-  WriteLn('  Note: /a is equivalent to -a');
+  WriteLn('  Note: /x is equivalent to -x');
 end;
 
 end.
