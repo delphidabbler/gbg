@@ -5,6 +5,8 @@ A Windows command line program to create a file of a given size, filled with ***
 ## Usage
 
     gbg <filepath> <size> [options]
+    gbg -V
+    gbg
 
 where
 
@@ -18,13 +20,11 @@ where
 
     * `-A` -- Generate random ASCII characters, including control codes, in range 0 to 127. Do not use with `-a`.
 
-    Note that `-` can be replaced by `/` in options. E.g. `-a` can be specified as `/a`.
+* `-V` on its own causes the program to display version information and exit
 
-Entering
+* Providing no parameters cause the program to display brief usage information and exit.
 
-    gbg
-
-on its own displays brief usage information.
+Note that `-` can be replaced by `/` in options. E.g. `-a` can be specified as `/a` and `-V` can be specified as `/V`.
 
 ## Operation
 

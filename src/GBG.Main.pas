@@ -240,6 +240,8 @@ begin
   Writeln('Usage:');
   Writeln;
   Writeln('  gbg filename size [options]');
+  Writeln('  gbg -V');
+  Writeln('  gbg');
   Writeln;
   Writeln('  Where:');
   Writeln('    filename = name of file to create');
@@ -249,9 +251,13 @@ begin
       [TNumberFmt.Create(MaxSupportedFileSize).ToString]
     )
   );
-  WriteLn('    options = -a | -A');
+  WriteLn('    options = zero or more of:');
   WriteLn('      -a -> generate printable ASCII characters (code 32..126)');
   WriteLn('      -A -> generate all ASCII characters (code 0..127)');
+  WriteLn;
+  WriteLn('    -V = display version information and halt');
+  WriteLn;
+  WriteLn('    no parameters = display this information and halt');
   WriteLn;
   WriteLn('  Note: /x is equivalent to -x');
 end;
