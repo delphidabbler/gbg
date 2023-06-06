@@ -33,10 +33,13 @@ class function TGeneratorFactory.CreateInstance(
   const AGenType: TGeneratorType): TBaseGenerator;
 const
   GenClasses: array[TGeneratorType] of TGeneratorClass = (
-    TBinaryGarbageGenerator, TPrintableASCIIGarbageGenerator
+    TBinaryGarbageGenerator,
+    TPrintableASCIIGarbageGenerator,
+    TASCIIGarbageGenerator
   );
 begin
   Result := GenClasses[AGenType].Create;
 end;
 
 end.
+

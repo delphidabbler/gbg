@@ -12,6 +12,11 @@ type
     procedure FillBuffer(var Buffer: TBytes); override;
   end;
 
+  TASCIIGarbageGenerator = class sealed(TBaseGenerator)
+  public
+    procedure FillBuffer(var Buffer: TBytes); override;
+  end;
+
 implementation
 
 uses
@@ -35,4 +40,15 @@ begin
   end;
 end;
 
+{ TASCIIGarbageGenerator }
+
+procedure TASCIIGarbageGenerator.FillBuffer(var Buffer: TBytes);
+begin
+  Randomize;
+  for var Idx: UInt64 := 0 to Pred(Length(Buffer)) do
+    // Get ASCII code in range 0..127
+    Buffer[Idx] := Random(128);
+end;
+
 end.
+

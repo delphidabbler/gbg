@@ -66,6 +66,10 @@ begin
       begin
         fGeneratorType := TGeneratorType.PrintableASCII;
       end
+      else if (Length(Cmd) = 2) and (Cmd[2] = 'A') then
+      begin
+        fGeneratorType := TGeneratorType.ASCII;
+      end
       else
         raise EUsageError.CreateFmt('Option not valid: "%s"', [Cmd]);
     end
