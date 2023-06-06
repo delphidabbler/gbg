@@ -15,6 +15,7 @@ type
       fFileName: string;
       fFileSize: UInt64;
       fGeneratorType: TGeneratorType;
+      fShowVersion: Boolean;
       fIsFileSizeSet: Boolean;
       fMaxFileSize: UInt64;
     function IsOption(const S: string): Boolean;
@@ -24,6 +25,7 @@ type
     property FileName: string read fFileName;
     property FileSize: UInt64 read fFileSize;
     property GeneratorType: TGeneratorType read fGeneratorType;
+    property ShowVersion: Boolean read fShowVersion;
   end;
 
 implementation
@@ -44,6 +46,7 @@ begin
   fFileName := '';
   fFileSize := 0;
   fGeneratorType := TGeneratorType.Binary;
+  fShowVersion := False;
   fIsFileSizeSet := False;
   ParseCommandLine;
 end;
@@ -70,6 +73,8 @@ begin
       begin
         fGeneratorType := TGeneratorType.ASCII;
       end
+      else if (Length(Cmd) = 2) and (Cmd[2] = 'V') then
+        fShowVersion := True
       else
         raise EUsageError.CreateFmt('Option not valid: "%s"', [Cmd]);
     end
@@ -90,7 +95,12 @@ begin
         raise EUsageError.Create('Too many parameters');
     end;
   end;
-  if (fFileName = '') or not fIsFileSizeSet then
+  if fShowVersion then
+  begin
+    if ParamCount <> 1 then
+      raise EUsageError.Create('-V must be the only parameter');
+  end
+  else if (fFileName = '') or not fIsFileSizeSet then
     raise EUsageError.Create('A file name and a file size are required');
 end;
 

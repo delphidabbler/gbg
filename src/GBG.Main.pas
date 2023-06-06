@@ -42,6 +42,7 @@ type
     class procedure HandleExecutionException(const E: Exception);
     class function FreeSpaceOnFileDrive: UInt64;
     class procedure Usage;
+    class procedure Version;
     class procedure Initialise;
     class procedure Execute;
   public
@@ -56,6 +57,7 @@ uses
   System.Classes,
   System.Math,
   System.Character,
+  GBG.AppInfo,
   GBG.Exceptions,
   GBG.Generator.Base,
   GBG.Generator.BinaryGarbage,
@@ -206,8 +208,6 @@ end;
 class procedure TMain.Initialise;
 begin
 
-  fParams := TParams.Create(MaxSupportedFileSize);
-
   CheckUserPermissions; // raises exceptions if user denies permissions
 
   if fParams.FileSize > FreeSpaceOnFileDrive then
@@ -220,8 +220,14 @@ end;
 class procedure TMain.Run;
 begin
   try
-    Initialise;
-    Execute;
+    fParams := TParams.Create(MaxSupportedFileSize);
+    if fParams.ShowVersion then
+      Version
+    else
+    begin
+      Initialise;
+      Execute;
+    end;
     ExitCode := TExitCode.None;
   except
     on E: Exception do
@@ -234,6 +240,8 @@ begin
   Writeln('Usage:');
   Writeln;
   Writeln('  gbg filename size [options]');
+  Writeln('  gbg -V');
+  Writeln('  gbg');
   Writeln;
   Writeln('  Where:');
   Writeln('    filename = name of file to create');
@@ -243,11 +251,22 @@ begin
       [TNumberFmt.Create(MaxSupportedFileSize).ToString]
     )
   );
-  WriteLn('    options = -a | -A');
+  WriteLn('    options = zero or more of:');
   WriteLn('      -a -> generate printable ASCII characters (code 32..126)');
   WriteLn('      -A -> generate all ASCII characters (code 0..127)');
   WriteLn;
+  WriteLn('    -V = display version information and halt');
+  WriteLn;
+  WriteLn('    no parameters = display this information and halt');
+  WriteLn;
   WriteLn('  Note: /x is equivalent to -x');
+end;
+
+class procedure TMain.Version;
+begin
+  WriteLn(
+    Format('%s %s ', [TAppInfo.ProgramVersion, TAppInfo.ProgramExeDate])
+  );
 end;
 
 end.
