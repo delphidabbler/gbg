@@ -201,6 +201,13 @@ $(PreBuildEvent)]]></PreBuildEvent>
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
         <DCCReference Include="GBG.Main.pas"/>
+        <DCCReference Include="GBG.Generator.Base.pas"/>
+        <DCCReference Include="GBG.Generator.BinaryGarbage.pas"/>
+        <DCCReference Include="GBG.NumberFmt.pas"/>
+        <DCCReference Include="GBG.Params.pas"/>
+        <DCCReference Include="GBG.Exceptions.pas"/>
+        <DCCReference Include="GBG.Types.pas"/>
+        <DCCReference Include="GBG.Generator.PrintableASCIIGarbage.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -1097,7 +1104,7 @@ $(PreBuildEvent)]]></PreBuildEvent>
     <Import Project="$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj" Condition="Exists('$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj')"/>
     <Import Project="$(MSBuildProjectName).deployproj" Condition="Exists('$(MSBuildProjectName).deployproj')"/>
     <PropertyGroup Condition="'$(Config)'=='Debug' And '$(Platform)'=='Win32'">
-        <PreBuildEvent>DEL &quot;..\_build\$(Platform)\$(Config)\bin\Version.res&quot;&amp;&amp;&quot;$(VIEDROOT)\VIEd.exe&quot; -makerc  .\Version.vi .\Version.virc&amp;&amp;&quot;$(BDSBIN)\BRCC32&quot; -fo &quot;..\_build\$(Platform)\$(Config)\bin\Version.res&quot; .\Version.virc &amp;&amp;DEL .\Version.virc</PreBuildEvent>
+        <PreBuildEvent>DEL &quot;..\_build\$(Platform)\$(Config)\bin\Version.res&quot;&amp;&amp;&quot;$(VIEDROOT)\VIEd.exe&quot; -makerc  .\Version.vi .\Version.virc&amp;&amp;&quot;$(BDSBIN)\BRCC32&quot; -fo &quot;..\_build\$(Platform)\$(Config)\bin\Version.res&quot; .\Version.virc &amp;&amp;DEL .\Version.virc</PreBuildEvent>
         <PreBuildEventIgnoreExitCode>False</PreBuildEventIgnoreExitCode>
         <PreLinkEvent/>
         <PreLinkEventIgnoreExitCode>False</PreLinkEventIgnoreExitCode>
@@ -1105,7 +1112,7 @@ $(PreBuildEvent)]]></PreBuildEvent>
         <PostBuildEventIgnoreExitCode>False</PostBuildEventIgnoreExitCode>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='Debug' And '$(Platform)'=='Win64'">
-        <PreBuildEvent>DEL &quot;..\_build\$(Platform)\$(Config)\bin\Version.res&quot;&amp;&amp;&quot;$(VIEDROOT)\VIEd.exe&quot; -makerc  .\Version.vi .\Version.virc&amp;&amp;&quot;$(BDSBIN)\BRCC32&quot; -fo &quot;..\_build\$(Platform)\$(Config)\bin\Version.res&quot; .\Version.virc &amp;&amp;DEL .\Version.virc</PreBuildEvent>
+        <PreBuildEvent>DEL &quot;..\_build\$(Platform)\$(Config)\bin\Version.res&quot;&amp;&amp;&quot;$(VIEDROOT)\VIEd.exe&quot; -makerc  .\Version.vi .\Version.virc&amp;&amp;&quot;$(BDSBIN)\BRCC32&quot; -fo &quot;..\_build\$(Platform)\$(Config)\bin\Version.res&quot; .\Version.virc &amp;&amp;DEL .\Version.virc</PreBuildEvent>
         <PreBuildEventIgnoreExitCode>False</PreBuildEventIgnoreExitCode>
         <PreLinkEvent/>
         <PreLinkEventIgnoreExitCode>False</PreLinkEventIgnoreExitCode>
@@ -1113,7 +1120,7 @@ $(PreBuildEvent)]]></PreBuildEvent>
         <PostBuildEventIgnoreExitCode>False</PostBuildEventIgnoreExitCode>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='Release' And '$(Platform)'=='Win32'">
-        <PreBuildEvent>DEL &quot;..\_build\$(Platform)\$(Config)\bin\Version.res&quot;&amp;&amp;&quot;$(VIEDROOT)\VIEd.exe&quot; -makerc  .\Version.vi .\Version.virc&amp;&amp;&quot;$(BDSBIN)\BRCC32&quot; -fo &quot;..\_build\$(Platform)\$(Config)\bin\Version.res&quot; .\Version.virc &amp;&amp;DEL .\Version.virc</PreBuildEvent>
+        <PreBuildEvent>DEL &quot;..\_build\$(Platform)\$(Config)\bin\Version.res&quot;&amp;&amp;&quot;$(VIEDROOT)\VIEd.exe&quot; -makerc  .\Version.vi .\Version.virc&amp;&amp;&quot;$(BDSBIN)\BRCC32&quot; -fo &quot;..\_build\$(Platform)\$(Config)\bin\Version.res&quot; .\Version.virc &amp;&amp;DEL .\Version.virc</PreBuildEvent>
         <PreBuildEventIgnoreExitCode>False</PreBuildEventIgnoreExitCode>
         <PreLinkEvent/>
         <PreLinkEventIgnoreExitCode>False</PreLinkEventIgnoreExitCode>
@@ -1121,7 +1128,7 @@ $(PreBuildEvent)]]></PreBuildEvent>
         <PostBuildEventIgnoreExitCode>False</PostBuildEventIgnoreExitCode>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='Release' And '$(Platform)'=='Win64'">
-        <PreBuildEvent>DEL &quot;..\_build\$(Platform)\$(Config)\bin\Version.res&quot;&amp;&amp;&quot;$(VIEDROOT)\VIEd.exe&quot; -makerc  .\Version.vi .\Version.virc&amp;&amp;&quot;$(BDSBIN)\BRCC32&quot; -fo &quot;..\_build\$(Platform)\$(Config)\bin\Version.res&quot; .\Version.virc &amp;&amp;DEL .\Version.virc</PreBuildEvent>
+        <PreBuildEvent>DEL &quot;..\_build\$(Platform)\$(Config)\bin\Version.res&quot;&amp;&amp;&quot;$(VIEDROOT)\VIEd.exe&quot; -makerc  .\Version.vi .\Version.virc&amp;&amp;&quot;$(BDSBIN)\BRCC32&quot; -fo &quot;..\_build\$(Platform)\$(Config)\bin\Version.res&quot; .\Version.virc &amp;&amp;DEL .\Version.virc</PreBuildEvent>
         <PreBuildEventIgnoreExitCode>False</PreBuildEventIgnoreExitCode>
         <PreLinkEvent/>
         <PreLinkEventIgnoreExitCode>False</PreLinkEventIgnoreExitCode>
