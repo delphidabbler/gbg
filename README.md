@@ -20,6 +20,10 @@ where
 
     * `-A` -- Generate random ASCII characters, including control codes, in range 0 to 127. Do not use with `-a`.
 
+    * `-o` -- Program stops with an error if the output file already exists. Do not use with `-O`.
+
+    * `-O` -- Program silently overwrites any file with the same name as the output file. Do not use with `-o`.
+
 * `-V` on its own causes the program to display version information and exit
 
 * Providing no parameters cause the program to display brief usage information and exit.

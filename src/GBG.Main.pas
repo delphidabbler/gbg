@@ -272,6 +272,8 @@ begin
   WriteLn('    options = zero or more of:');
   WriteLn('      -a -> generate printable ASCII characters (code 32..126)');
   WriteLn('      -A -> generate all ASCII characters (code 0..127)');
+  WriteLn('      -o -> stop with error if output file already exists');
+  WriteLn('      -O -> silently overwrite existing output file with same name');
   WriteLn;
   WriteLn('    -V = display version information and halt');
   WriteLn;
