@@ -24,6 +24,10 @@ where
 
     * `-O` -- Program silently overwrites any file with the same name as the output file. Do not use with `-o`.
 
+    * `-l` -- Program stops with an error if the requested output file size exceeds 500Mb. Do not use with `-L`.
+
+    * `-L` -- Program silently creates a file of any requested size providing there is sufficient disk space. Do not use with `-l`.
+
 * `-V` on its own causes the program to display version information and exit
 
 * Providing no parameters cause the program to display brief usage information and exit.
