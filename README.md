@@ -38,9 +38,9 @@ Note that `-` can be replaced by `/` in options. E.g. `-a` can be specified as `
 
 Files up to 10MiB in size are generated with random bytes. Files larger than 10MiB have the first 10MiB bytes generated randomly, but then that same 10MiB pattern is then repeated as many times as necessary. If the requested file size is zero then an empty file is created.
 
-If a file size of more than 500,000,000 (500Mb) is entered then the user is asked to confirm the size.
+By default, if a file size of more than 500,000,000 (500Mb) is entered then the user is asked to confirm the size. This behaviour can be overridden by specifying either the `-l` or `-L` options (see above).
 
-If the given file already exists the user is asked to confirm that the file can be overwritten.
+If the given file already exists the user is asked to confirm that the file can be overwritten. This behaviour can be overridden by specifying either the `-o` or `-O` options (see above).
 
 ## Installing & Uninstalling
 
