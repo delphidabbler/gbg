@@ -15,6 +15,7 @@ type
       Execuction = 1;
       Usage = 2;
       Cancellation = 3;
+      FileExists = 4;
       Unknown = 9;
   end;
 
@@ -61,7 +62,8 @@ uses
   GBG.Exceptions,
   GBG.Generator.Base,
   GBG.Generator.BinaryGarbage,
-  GBG.NumberFmt;
+  GBG.NumberFmt,
+  GBG.Types;
 
 { TMain }
 
@@ -80,8 +82,19 @@ begin
   end;
   if TFile.Exists(fParams.FileName) then
   begin
-    if not GetConfirmation('File already exists. Overwrite? [y/N]', 'Y') then
-      raise ECancellation.Create('Operation cancelled');
+    case fParams.ExistingFileAction of
+      TExistingFileAction.Prompt:
+        if not GetConfirmation(
+          'Output file already exists. Overwrite? [y/N]', 'Y'
+        ) then
+          raise ECancellation.Create('Operation cancelled');
+      TExistingFileAction.Error:
+        raise EFileExists.Create(
+          'Output file already exists. Use -O option to overwrite.'
+        );
+      TExistingFileAction.Overwrite:
+        ; // do nothing - permit file to be overwritten
+    end;
   end;
 end;
 
@@ -191,6 +204,11 @@ begin
   begin
     Writeln('Error: ' + E.Message);
     ExitCode := TExitCode.Execuction;
+  end
+  else if E is EFileExists then
+  begin
+    Writeln('Error: ' + E.Message);
+    ExitCode := TExitCode.FileExists;
   end
   else if E is ESilent then
   begin

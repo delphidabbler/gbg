@@ -11,6 +11,8 @@ type
 
   ECancellation = class(Exception);
 
+  EFileExists = class(Exception);
+
   EExecutionError = class(Exception);
 
   ESilent = class(Exception);
