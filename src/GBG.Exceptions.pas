@@ -13,6 +13,8 @@ type
 
   EFileExists = class(Exception);
 
+  EFileTooBig = class(Exception);
+
   EExecutionError = class(Exception);
 
   ESilent = class(Exception);

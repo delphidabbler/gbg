@@ -1,8 +1,11 @@
 unit GBG.Types;
 
+{$SCOPEDENUMS ON}
+
 interface
 
 type
+
 
   TGeneratorType = (
     Binary,
@@ -14,6 +17,12 @@ type
     Prompt,
     Error,
     Overwrite
+  );
+
+  TLargeFileAction = (
+    Prompt,
+    Error,
+    Allow
   );
 
 implementation
