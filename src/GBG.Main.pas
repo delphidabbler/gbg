@@ -290,6 +290,8 @@ begin
   WriteLn('      -A -> generate all ASCII characters (code 0..127)');
   WriteLn('      -o -> stop with error if output file already exists');
   WriteLn('      -O -> silently overwrite existing output file with same name');
+  WriteLn('      -l -> stop with error if requested file size > 500Mb');
+  WriteLn('      -L -> silently create file of any size, ignoring 500Mb limit');
   WriteLn;
   WriteLn('    -V = display version information and halt');
   WriteLn;
