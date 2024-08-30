@@ -10,6 +10,12 @@ type
     ASCII
   );
 
+  TExistingFileAction = (
+    Prompt,
+    Error,
+    Overwrite
+  );
+
 implementation
 
 end.
