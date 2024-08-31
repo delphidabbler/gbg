@@ -7,7 +7,7 @@ All notable changes to this project are documented in this file. Releases are li
 ## v0.4.0 - 2024-08-31
 
 * Added new `-l` and `-L` command line options to inhibit the prompt when a file larger than 500Mb is requested [issue #11]. `-l` halts the program with an error if such a large file is requested while `-L` silently creates a file of any size.
-* Added new `-o` and `-O` command line options to inhibit the file overwrite prompt from appearing when a file name already exists [issue #12]. `-o` * * halts the program with an error if a file with the same name exists while `-O` silently overwrites any existing file. 
+* Added new `-o` and `-O` command line options to inhibit the file overwrite prompt from appearing when a file name already exists [issue #12]. `-o` halts the program with an error if a file with the same name exists while `-O` silently overwrites any existing file. 
 * Changed to compile with Delphi 12.1 [issue #13].
 * Documentated new options in `README.md` and made some other updates.
 
