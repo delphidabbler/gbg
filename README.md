@@ -20,19 +20,27 @@ where
 
     * `-A` -- Generate random ASCII characters, including control codes, in range 0 to 127. Do not use with `-a`.
 
+    * `-l` -- Program stops with an error if the requested output file size exceeds 500Mb. Do not use with `-L`.
+
+    * `-L` -- Program silently creates a file of any requested size providing there is sufficient disk space. Do not use with `-l`.
+
+    * `-o` -- Program stops with an error if the output file already exists. Do not use with `-O`.
+
+    * `-O` -- Program silently overwrites any file with the same name as the output file. Do not use with `-o`.
+
 * `-V` on its own causes the program to display version information and exit
 
-* Providing no parameters cause the program to display brief usage information and exit.
+* Providing no parameters causes the program to display brief usage information and exit.
 
 Note that `-` can be replaced by `/` in options. E.g. `-a` can be specified as `/a` and `-V` can be specified as `/V`.
 
 ## Operation
 
-Files up to 10MiB in size are generated with random bytes. Files larger than 10MiB have the first 10MiB bytes generated randomly, but then that same 10MiB pattern is then repeated as many times as necessary. If the requested file size is zero then an empty file is created.
+Files up to 10MiB in size are generated with random bytes. Files larger than 10MiB have the first 10MiB bytes generated randomly, but then that same 10MiB pattern is repeated as many times as necessary. If the requested file size is zero then an empty file is created.
 
-If a file size of more than 500,000,000 (500Mb) is entered then the user is asked to confirm the size.
+By default, if a file size of more than 500,000,000 (500Mb) is entered then the user is asked to confirm the size. This behaviour can be overridden by specifying either the `-l` or `-L` options (see above).
 
-If the given file already exists the user is asked to confirm that the file can be overwritten.
+If the given file already exists the user is asked to confirm that the file can be overwritten. This behaviour can be overridden by specifying either the `-o` or `-O` options (see above).
 
 ## Installing & Uninstalling
 
@@ -58,13 +66,13 @@ Full source code is available from the [delphidabbler/gbg](https://github.com/de
 
 Contributions are welcome.
 
-The GitFlow methodolgy is used. Please fork the repository above then create a feature branch off the `develop` branch. When you have made your changes please rebase you branch onto `develop` then submit a [pull request](https://github.com/delphidabbler/gbg/pulls) on GitHub.
+The GitFlow methodology is used. Please fork the repository above then create a feature branch off the `develop` branch. When you have made your changes please rebase you branch onto `develop` then submit a [pull request](https://github.com/delphidabbler/gbg/pulls) on GitHub.
 
 > :no_entry: Pull requests that have been branched from `main` will be rejected.
 
 ## Compiling
 
-_gbg_ is compiled using Delphi 11.3 Alexandria. 
+_gbg_ is compiled using Delphi 12.1. Delphi 11 may work, but has not been tested.
 
 The program can be compiled from the Delphi IDE as 32 bit or 64 bit Windows targets and as either Debug or Release builds. Just choose the appropriate target platform and build configuration in the IDE before building.
 

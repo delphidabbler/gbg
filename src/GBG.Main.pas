@@ -15,6 +15,8 @@ type
       Execuction = 1;
       Usage = 2;
       Cancellation = 3;
+      FileExists = 4;
+      LargeFile = 5;
       Unknown = 9;
   end;
 
@@ -61,7 +63,8 @@ uses
   GBG.Exceptions,
   GBG.Generator.Base,
   GBG.Generator.BinaryGarbage,
-  GBG.NumberFmt;
+  GBG.NumberFmt,
+  GBG.Types;
 
 { TMain }
 
@@ -69,19 +72,40 @@ class procedure TMain.CheckUserPermissions;
 begin
   if fParams.FileSize > MaxUnchallengedFileSize  then
   begin
-    if not GetConfirmation(
-      Format(
-        'Requested size is greater than %s bytes. Continue? [y/N]',
-        [TNumberFmt.Create(MaxUnchallengedFileSize).ToString]
-      ),
-      'Y'
-    ) then
-      raise ECancellation.Create('Operation cancelled');
+    case fParams.LargeFileAction of
+      TLargeFileAction.Prompt:
+        if not GetConfirmation(
+          Format(
+            'Requested size is greater than %s bytes. Continue? [y/N]',
+            [TNumberFmt.Create(MaxUnchallengedFileSize).ToString]
+          ),
+          'Y'
+        ) then
+          raise ECancellation.Create('Operation cancelled');
+      TLargeFileAction.Error:
+        raise EFileTooBig.CreateFmt(
+          'Output file is greater than %s bytes. Use -L option to allow.',
+          [TNumberFmt.Create(MaxUnchallengedFileSize).ToString]
+        );
+      TLargeFileAction.Allow:
+        ; // do nothing - allow large file to be createed
+    end;
   end;
   if TFile.Exists(fParams.FileName) then
   begin
-    if not GetConfirmation('File already exists. Overwrite? [y/N]', 'Y') then
-      raise ECancellation.Create('Operation cancelled');
+    case fParams.ExistingFileAction of
+      TExistingFileAction.Prompt:
+        if not GetConfirmation(
+          'Output file already exists. Overwrite? [y/N]', 'Y'
+        ) then
+          raise ECancellation.Create('Operation cancelled');
+      TExistingFileAction.Error:
+        raise EFileExists.Create(
+          'Output file already exists. Use -O option to overwrite.'
+        );
+      TExistingFileAction.Overwrite:
+        ; // do nothing - permit file to be overwritten
+    end;
   end;
 end;
 
@@ -192,6 +216,16 @@ begin
     Writeln('Error: ' + E.Message);
     ExitCode := TExitCode.Execuction;
   end
+  else if E is EFileExists then
+  begin
+    Writeln('Error: ' + E.Message);
+    ExitCode := TExitCode.FileExists;
+  end
+  else if E is EFileTooBig then
+  begin
+    Writeln('Error: ' + E.Message);
+    ExitCode := TExitCode.LargeFile;
+  end
   else if E is ESilent then
   begin
     Usage;
@@ -254,6 +288,10 @@ begin
   WriteLn('    options = zero or more of:');
   WriteLn('      -a -> generate printable ASCII characters (code 32..126)');
   WriteLn('      -A -> generate all ASCII characters (code 0..127)');
+  WriteLn('      -l -> stop with error if requested file size > 500Mb');
+  WriteLn('      -L -> silently create file of any size, ignoring 500Mb limit');
+  WriteLn('      -o -> stop with error if output file already exists');
+  WriteLn('      -O -> silently overwrite existing output file with same name');
   WriteLn;
   WriteLn('    -V = display version information and halt');
   WriteLn;

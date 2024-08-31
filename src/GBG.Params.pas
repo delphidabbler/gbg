@@ -15,6 +15,8 @@ type
       fFileName: string;
       fFileSize: UInt64;
       fGeneratorType: TGeneratorType;
+      fExistingFileAction: TExistingFileAction;
+      fLargeFileAction: TLargeFileAction;
       fShowVersion: Boolean;
       fIsFileSizeSet: Boolean;
       fMaxFileSize: UInt64;
@@ -25,6 +27,8 @@ type
     property FileName: string read fFileName;
     property FileSize: UInt64 read fFileSize;
     property GeneratorType: TGeneratorType read fGeneratorType;
+    property ExistingFileAction: TExistingFileAction read fExistingFileAction;
+    property LargeFileAction: TLargeFileAction read fLargeFileAction;
     property ShowVersion: Boolean read fShowVersion;
   end;
 
@@ -46,6 +50,8 @@ begin
   fFileName := '';
   fFileSize := 0;
   fGeneratorType := TGeneratorType.Binary;
+  fExistingFileAction := TExistingFileAction.Prompt;
+  fLargeFileAction := TLargeFileAction.Prompt;
   fShowVersion := False;
   fIsFileSizeSet := False;
   ParseCommandLine;
@@ -72,6 +78,22 @@ begin
       else if (Length(Cmd) = 2) and (Cmd[2] = 'A') then
       begin
         fGeneratorType := TGeneratorType.ASCII;
+      end
+      else if (Length(Cmd) = 2) and (Cmd[2] = 'o') then
+      begin
+        fExistingFileAction := TExistingFileAction.Error;
+      end
+      else if (Length(Cmd) = 2) and (Cmd[2] = 'O') then
+      begin
+        fExistingFileAction := TExistingFileAction.Overwrite;
+      end
+      else if (Length(Cmd) = 2) and (Cmd[2] = 'l') then
+      begin
+        fLargeFileAction := TLargeFileAction.Error;
+      end
+      else if (Length(Cmd) = 2) and (Cmd[2] = 'L') then
+      begin
+        fLargeFileAction := TLargeFileAction.Allow;
       end
       else if (Length(Cmd) = 2) and (Cmd[2] = 'V') then
         fShowVersion := True
