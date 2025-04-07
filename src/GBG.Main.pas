@@ -4,6 +4,8 @@ interface
 
 uses
   System.SysUtils,
+  System.Classes,
+  GBG.Types,
   GBG.Params;
 
 type
@@ -20,23 +22,20 @@ type
       Unknown = 9;
   end;
 
+  TBufferCallback = reference to procedure (const BytesRemaining: UInt64;
+    out Buffer: TBytes);
+
   TMain = class
   strict private
     const
-      TwoPower10 = UInt64(1_024);
-      OneThousand = UInt64(1_000);
-      kB = OneThousand;
-      MB = OneThousand * kB;
-      KiB = TwoPower10;
-      MiB = TwoPower10 * KiB;
-      GiB = TwoPower10 * MiB;
-      BufSize = 10 * MiB;
-      MaxUnchallengedFileSize = 500 * MB;   // 500,000,000 bytes
-      MaxSupportedFileSize = 20 * GiB;      // 21,474,836,480 bytes
+      MaxUnchallengedFileSize = 500 * TMemUnits.OneMB;      // 500,000,000 bytes
+      {$IFDEF Win64}
+      MaxSupportedFileSize = 20 * TMemUnits.OneGiB;      // 21,474,836,480 bytes
+      {$ELSE}
+      MaxSupportedFileSize = 1 * TMemUnits.OneGiB;        // 1,073,741,824 bytes
+      {$ENDIF}
     class var
       fParams: TParams;
-    class procedure FillBufferWithGarbage(var Bytes: TBytes);
-    class procedure CreateBuffer(out Buffer: TBytes);
     class function GetConfirmation(const Question: string;
       const TrueResponse: Char): Boolean;
     class procedure CheckUserPermissions;
@@ -56,15 +55,13 @@ implementation
 
 uses
   System.IOUtils,
-  System.Classes,
   System.Math,
   System.Character,
   GBG.AppInfo,
+  GBG.DataWriter,
   GBG.Exceptions,
   GBG.Generator.Base,
-  GBG.Generator.BinaryGarbage,
-  GBG.NumberFmt,
-  GBG.Types;
+  GBG.NumberFmt;
 
 { TMain }
 
@@ -109,13 +106,6 @@ begin
   end;
 end;
 
-class procedure TMain.CreateBuffer(out Buffer: TBytes);
-begin
-  SetLength(Buffer, Min(BufSize, fParams.FileSize));
-  if Length(Buffer) > 0 then
-    FillBufferWithGarbage(Buffer);
-end;
-
 class destructor TMain.Destroy;
 begin
   fParams.Free;
@@ -124,40 +114,39 @@ end;
 class procedure TMain.Execute;
 begin
   try
+    // Create output file
     var FS := TFileStream.Create(fParams.FileName, fmCreate);
     try
       if fParams.FileSize = 0 then
-        Exit;
-
-      var Buffer: TBytes;
-      CreateBuffer(Buffer);
-
-      var BytesRemaining := fParams.FileSize;
-      while BytesRemaining > 0 do
-      begin
-        var BytesToWrite: UInt64 := Min(BytesRemaining, UInt64(Length(Buffer)));
-        FS.WriteBuffer(Pointer(Buffer)^, BytesToWrite);
-        Dec(BytesRemaining, BytesToWrite);
+        Exit;   // file size is 0 => close empty file
+      // Create generator of required type
+      var Generator := TGeneratorFactory.CreateInstance(fParams.GeneratorType);
+      try
+        // Create data writer that output the random data
+        var Writer := TDataWriter.Create(FS, Generator);
+        try
+          if fParams.RandomDataChunkSize > 0 then
+            // We want 1 or more chunks of the same random data
+            Writer.WriteDuplicatedChunks(
+              fParams.FileSize, fParams.RandomDataChunkSize
+            )
+          else
+            // We want all data in the file to be random
+            Writer.WriteUniqueData(
+              fParams.FileSize, fParams.DefRandomDataChunkSize
+            );
+        finally
+          Writer.Free;
+        end;
+      finally
+        Generator.Free;
       end;
-
     finally
       FS.Free;
     end;
-
   except
     on E: Exception do
       HandleExecutionException(E);
-  end;
-end;
-
-class procedure TMain.FillBufferWithGarbage(var Bytes: TBytes);
-begin
-  Assert(Length(Bytes) > 0);
-  var Generator := TGeneratorFactory.CreateInstance(fParams.GeneratorType);
-  try
-    Generator.FillBuffer(Bytes);
-  finally
-    Generator.Free;
   end;
 end;
 
@@ -270,34 +259,81 @@ begin
 end;
 
 class procedure TMain.Usage;
+const
+  HelpText = '''
+  Usage:
+
+    gbg <filename> <size> [<options>]
+    gbg -V
+    gbg
+
+  Where:
+    <filename> = Name of file to create.
+    <size> = Size of file to create.
+      * Maximum file size is %0:s bytes.
+    <options> = zero or more of:
+      -a -> Generate printable ASCII characters (code 32..126).
+      -A -> Generate all ASCII characters (code 0..127).
+      -l -> Stop with error if requested file size > 500Mb.
+      -L -> Silently create file of any size, ignoring 500Mb limit.
+      -o -> Stop with error if output file already exists.
+      -O -> Silently overwrite any existing output file with same name.
+      -r:<number> -> Set the number of bytes of random data written before the
+         data repeats.
+         * Maximum value is %1:s bytes.
+         * Default value is %2:s bytes.
+      -r:all -> Random data does not repeat.
+
+    -V -> Display version information and halt.
+
+    no parameters ->   Display this information and halt.
+
+  A forward slash can be used instead of a dash in options.
+
+  A number of bytes is specified as a decimal number, with or without thousands
+  separators. The number can be expressed in Kb, KiB, MB, MiB, GB or GiB by
+  appending the appropriate symbol to the end of the number.
+  ''';
 begin
-  Writeln('Usage:');
-  Writeln;
-  Writeln('  gbg filename size [options]');
-  Writeln('  gbg -V');
-  Writeln('  gbg');
-  Writeln;
-  Writeln('  Where:');
-  Writeln('    filename = name of file to create');
   Writeln(
     Format(
-      '    size = size of file to create (0..%s)',
-      [TNumberFmt.Create(MaxSupportedFileSize).ToString]
+      HelpText,
+      [
+        TNumberFmt.Create(MaxSupportedFileSize).ToString,
+        TNumberFmt.Create(TParams.MaxRandomDataChunkSize).ToString,
+        TNumberFmt.Create(TParams.DefRandomDataChunkSize).ToString
+      ]
     )
   );
-  WriteLn('    options = zero or more of:');
-  WriteLn('      -a -> generate printable ASCII characters (code 32..126)');
-  WriteLn('      -A -> generate all ASCII characters (code 0..127)');
-  WriteLn('      -l -> stop with error if requested file size > 500Mb');
-  WriteLn('      -L -> silently create file of any size, ignoring 500Mb limit');
-  WriteLn('      -o -> stop with error if output file already exists');
-  WriteLn('      -O -> silently overwrite existing output file with same name');
-  WriteLn;
-  WriteLn('    -V = display version information and halt');
-  WriteLn;
-  WriteLn('    no parameters = display this information and halt');
-  WriteLn;
-  WriteLn('  Note: /x is equivalent to -x');
+//  Writeln('Usage:');
+//  Writeln;
+//  Writeln('  gbg filename size [options]');
+//  Writeln('  gbg -V');
+//  Writeln('  gbg');
+//  Writeln;
+//  Writeln('  Where:');
+//  Writeln('    filename = name of file to create');
+//  Writeln(
+//    Format(
+//      '    size = size of file to create (0..%s)',
+//      [TNumberFmt.Create(MaxSupportedFileSize).ToString]
+//    )
+//  );
+//  WriteLn('    options = zero or more of:');
+//  WriteLn('      -a -> generate printable ASCII characters (code 32..126)');
+//  WriteLn('      -A -> generate all ASCII characters (code 0..127)');
+//  WriteLn('      -l -> stop with error if requested file size > 500Mb');
+//  WriteLn('      -L -> silently create file of any size, ignoring 500Mb limit');
+//  WriteLn('      -o -> stop with error if output file already exists');
+//  WriteLn('      -O -> silently overwrite existing output file with same name');
+//  WriteLn('      -r:<number> -> set the size random data written before the');
+//  WriteLn('         data repeats (
+//  WriteLn;
+//  WriteLn('    -V = display version information and halt');
+//  WriteLn;
+//  WriteLn('    no parameters = display this information and halt');
+//  WriteLn;
+//  WriteLn('  Note: /x is equivalent to -x');
 end;
 
 class procedure TMain.Version;
