@@ -4,6 +4,7 @@ interface
 
 uses
   System.SysUtils,
+  System.Classes,
   GBG.Types,
   GBG.Params;
 
@@ -21,16 +22,20 @@ type
       Unknown = 9;
   end;
 
+  TBufferCallback = reference to procedure (const BytesRemaining: UInt64;
+    out Buffer: TBytes);
+
   TMain = class
   strict private
     const
-      BufSize = 10 * TMemUnits.OneMiB;
       MaxUnchallengedFileSize = 500 * TMemUnits.OneMB;      // 500,000,000 bytes
       MaxSupportedFileSize = 20 * TMemUnits.OneGiB;      // 21,474,836,480 bytes
     class var
       fParams: TParams;
     class procedure FillBufferWithGarbage(var Bytes: TBytes);
-    class procedure CreateBuffer(out Buffer: TBytes);
+    class procedure CreateBuffer(const BufferSize: UInt64; out Buffer: TBytes);
+    class procedure WriteBytes(const FS: TFileStream; const ByteCount: UInt64;
+      NextBuffer: TBufferCallback);
     class function GetConfirmation(const Question: string;
       const TrueResponse: Char): Boolean;
     class procedure CheckUserPermissions;
@@ -50,7 +55,6 @@ implementation
 
 uses
   System.IOUtils,
-  System.Classes,
   System.Math,
   System.Character,
   GBG.AppInfo,
@@ -102,9 +106,10 @@ begin
   end;
 end;
 
-class procedure TMain.CreateBuffer(out Buffer: TBytes);
+class procedure TMain.CreateBuffer(const BufferSize: UInt64;
+  out Buffer: TBytes);
 begin
-  SetLength(Buffer, Min(BufSize, fParams.FileSize));
+  SetLength(Buffer, Min(BufferSize, fParams.FileSize));
   if Length(Buffer) > 0 then
     FillBufferWithGarbage(Buffer);
 end;
@@ -122,17 +127,40 @@ begin
       if fParams.FileSize = 0 then
         Exit;
 
-      var Buffer: TBytes;
-      CreateBuffer(Buffer);
+      var GarbageBuffer: TBytes;
 
-      var BytesRemaining := fParams.FileSize;
-      while BytesRemaining > 0 do
+      if fParams.RandomDataChunkSize > 0 then
       begin
-        var BytesToWrite: UInt64 := Min(BytesRemaining, UInt64(Length(Buffer)));
-        FS.WriteBuffer(Pointer(Buffer)^, BytesToWrite);
-        Dec(BytesRemaining, BytesToWrite);
+        // We reuse the same buffer of random bytes as many times as required
+        // Generate a buffer
+        CreateBuffer(
+          Min(fParams.RandomDataChunkSize, fParams.FileSize), GarbageBuffer
+        );
+        WriteBytes(
+          FS,
+          fParams.FileSize,
+          procedure (const BytesRemaining: UInt64; out Buffer: TBytes)
+          begin
+            Buffer := GarbageBuffer;
+          end
+        );
+      end
+      else
+      begin
+        // No blocks of bytes are re-used: the whole file is random. To do this
+        // we generate new buffer of random data each time the buffer is
+        // required
+        WriteBytes(
+          FS,
+          fParams.FileSize,
+          procedure (const BytesRemaining: UInt64; out Buffer: TBytes)
+          begin
+            CreateBuffer(
+              Min(fParams.DefRandomDataChunkSize, BytesRemaining), Buffer
+            );
+          end
+        );
       end;
-
     finally
       FS.Free;
     end;
@@ -298,6 +326,21 @@ begin
   WriteLn(
     Format('%s %s ', [TAppInfo.ProgramVersion, TAppInfo.ProgramExeDate])
   );
+end;
+
+class procedure TMain.WriteBytes(const FS: TFileStream; const ByteCount: UInt64;
+  NextBuffer: TBufferCallback);
+var
+  Buffer: TBytes;
+begin
+  var BytesRemaining := ByteCount;
+  while BytesRemaining > 0 do
+  begin
+    NextBuffer(BytesRemaining, Buffer);
+    var BytesToWrite: UInt64 := Min(BytesRemaining, UInt64(Length(Buffer)));
+    FS.WriteBuffer(Pointer(Buffer)^, BytesToWrite);
+    Dec(BytesRemaining, BytesToWrite);
+  end;
 end;
 
 end.
