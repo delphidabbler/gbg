@@ -35,7 +35,7 @@ where
 
     * `-O` -- Program silently overwrites any file with the same name as the output file. Do not use with `-o`.
 
-    * `-r:<number>` -- Sets the number of bytes of random data written before the data repeats. `<number>` can be entered in any of the formats described in the [Number Formats](#number-formats) section below. Setting `<number>` to zero is equivalent to the `-r:all` parameter - see below.
+    * `-r:<number>` -- Sets the number of bytes of random data written before the data repeats. `<number>` can be entered in any of the formats described in the [Number Formats](#number-formats) section below. Setting `<number>` to zero is equivalent to the `-r:all` option (see below).
 
         The maximum number of bytes that can be passed as `<number>` differs between the 32 and 64 bit versions of the program:
     
@@ -48,7 +48,7 @@ where
 
     * `-r:all` -- Sequences of random data never repeat. Do not use with `r:<number>`.
 
-* `-V` on its own causes the program to display version information and exit
+* `-V` on its own causes the program to display version information and exit.
 
 * Running `gbg` with no parameters causes the program to display usage information and exit.
 
@@ -60,7 +60,7 @@ Wherever a number of bytes must be specified on the command line, numbers in the
 
 * The number of bytes as a decimal number
 
-* A decimal number followed by one of the following IEC recognised symbol:
+* A decimal number followed by one of the following IEC recognised symbols:
 
     | IEC symbol | Name     | Number of bytes |
     |------------|----------|----------------:|
@@ -83,7 +83,7 @@ For example, in the en-GB locale, 4MiB can be expressed as:
 
 By default files up to 10MiB in size are generated with random bytes. Files larger than 10MiB have the first 10MiB bytes generated randomly, but then that same 10MiB pattern is repeated as many times as necessary. If the requested file size is zero then an empty file is created. The size of the repeating pattern can be changed using the `-r:<number>` command line option (see above). For example to repeat a random 100 byte pattern use `-r:100`. The whole file can be filled with a non-repeating pattern of bytes if the `-r:all` command line option is used (see above).
 
-By default, if a file size of more than 500,000,000 bytes (500Mb) is entered then the user is asked to confirm the size. This behaviour can be overridden by specifying either the `-l` or `-L` options (see above).
+By default, if a file size of more than 500,000,000 bytes (500Mb) is specified then the user is asked to confirm the size. This behaviour can be overridden by specifying either the `-l` or `-L` options (see above).
 
 If the given file already exists the user is asked to confirm that the file can be overwritten. This behaviour can be overridden by specifying either the `-o` or `-O` options (see above).
 
@@ -111,7 +111,7 @@ Full source code is available from the [delphidabbler/gbg](https://github.com/de
 
 Contributions are welcome.
 
-The GitFlow methodology is used. Please fork the repository above then create a feature branch off the `develop` branch. When you have made your changes please rebase you branch onto `develop` then submit a [pull request](https://github.com/delphidabbler/gbg/pulls) on GitHub.
+The GitFlow methodology is used. Please fork the repository above then create a feature branch off the `develop` branch. When you have made your changes please rebase your branch onto `develop` then submit a [pull request](https://github.com/delphidabbler/gbg/pulls) on GitHub.
 
 > ⛔ Pull requests that have been branched from `main` will be rejected.
 
@@ -121,7 +121,7 @@ _gbg_ is compiled using Delphi 12.2. Delphi 11 and earlier are not suitable.
 
 The program can be compiled from the Delphi IDE as 32 bit or 64 bit Windows targets and as either Debug or Release builds. Just choose the appropriate target platform and build configuration in the IDE before building.
 
-The build chain requires DelphiDabbler [Version Information Editor](https://delphidabbler.com/software/vied) ~> v2.15.0 to be installed and for its installation path to be stored in the `VIEDROOT` environment variable. This environment variable can be set in the Delphi _Tools | Options_ dialogue box in the _IDE | Environment Variables_ section: use the _User System Overrides_ section to set `VIEDROOT`.
+The build chain requires DelphiDabbler [Version Information Editor](https://delphidabbler.com/software/vied) ~>v2.15 to be installed and for its installation path to be stored in the `VIEDROOT` environment variable. This environment variable can be set in the Delphi _Tools | Options_ dialogue box in the _IDE | Environment Variables_ section: use the _User System Overrides_ section to set `VIEDROOT`.
 
 Releases are built by calling `Deploy.bat`. See the comments in the file for usage information and details of dependencies. The script will compile the 32 and 64 bit release targets and generate a read-me file before finally creating a zip file containing them all.
 
@@ -135,4 +135,4 @@ _gbg_ is MIT licensed. See `LICENSE.md`.
 
 ## Change Log
 
-Changes in each release are documentation in `CHANGELOG.md`.
+Changes in each release are documentated in `CHANGELOG.md`.
