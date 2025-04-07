@@ -12,7 +12,24 @@ where
 
 * `<filepath>` is the path of the file to be created. If a full path is not provided then the file is created relative to the current directory.
 
-* `<size>` is the size of the file to be created. Supported sizes are 0 to 21,474,836,480 bytes (2GiB). Sizes must be entered in bytes as a decimal number, optionally including thousands separators.
+* `<size>` is the size of the file to be created. Supported sizes are 0 to 21,474,836,480 bytes (2GiB). Sizes can be entered in a few differnt formats:
+
+    * The number of bytes as a decimal number
+    
+    * A decimal number followed by one of the following IEC recognised symbol:
+
+        | IEC symbol | Name     | Number of bytes |
+        |------------|----------|----------------:|
+        | kB         | kilobyte |           1,000 |
+        | KiB        | kibibyte |           1,024 |
+        | MB         | megabyte |       1,000,000 |
+        | MiB        | mebibyte |       1,048,576 |
+        | GB         | gigabyte |   1,000,000,000 |
+        | GiB        | gibibyte |   1,073,741,824 |
+
+        For example 27MiB or 1,000kB.
+
+    Decimal numbers can optionally include valid decimal separators in the program's locale.
 
 * `[options]` is zero or more of:
 

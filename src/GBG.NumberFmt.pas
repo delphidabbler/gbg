@@ -3,14 +3,20 @@ unit GBG.NumberFmt;
 interface
 
 uses
-  System.SysUtils;
+  System.SysUtils,
+  System.Generics.Collections;
 
 type
+
   TNumberFmt = record
   strict private
     var
       fValue: UInt64;
+    class var
+      fIECMap: TDictionary<string,UInt64>;
   public
+    class constructor Create;
+    class destructor Destroy;
     constructor Create(const AValue: UInt64);
     property Value: UInt64 read fValue write fValue;
     function ToString: string;
@@ -23,11 +29,45 @@ type
 
 implementation
 
+uses
+  System.Character,
+  System.Hash,
+  System.Generics.Defaults;
+
 { TNumberFmt }
 
 constructor TNumberFmt.Create(const AValue: UInt64);
 begin
   fValue := AValue;
+end;
+
+class destructor TNumberFmt.Destroy;
+begin
+  fIECMap.Free;
+end;
+
+class constructor TNumberFmt.Create;
+begin
+  fIECMap := TDictionary<string,UInt64>.Create(
+    TDelegatedEqualityComparer<string>.Create(
+      function (const Left, Right: string): Boolean
+      begin
+        Result := string.Compare(Left, Right, True) = 0;
+      end,
+      function (const Value: string): Integer
+      begin
+        Result := THashBobJenkins.GetHashValue(
+          string.UpperCase(Value, TLocaleOptions.loUserLocale)
+        );
+      end
+    )
+  );
+  fIECMap.Add('Kb',           1_000); // kilobyte
+  fIECMap.Add('KiB',          1_024); // kibibyte
+  fIECMap.Add('MB',       1_000_000);	// megabyte
+  fIECMap.Add('MiB',      1_048_576); // mebibyte
+  fIECMap.Add('GB',   1_000_000_000); // gigabyte
+  fIECMap.Add('GiB',  1_073_741_824); // gibibyte
 end;
 
 function TNumberFmt.ToString: string;
@@ -46,6 +86,7 @@ end;
 
 function TNumberFmt.TryParse(ANumStr: string): Boolean;
 
+  // Check the validity of the parts of number split by decimal separator
   function CheckNumParts(const Parts: array of string): Boolean;
   begin
     if Length(Parts) = 0 then
@@ -61,16 +102,59 @@ function TNumberFmt.TryParse(ANumStr: string): Boolean;
   end;
 
 begin
+  // Format is number, optionally with thousands separator, optionally ending in
+  // a IEC symbol
+
+  // get format settings for current locale to get correct decimal separator
   var Fmt := TFormatSettings.Create;
-  if ANumStr.Contains(Fmt.ThousandSeparator) then
+
+  // split string at decimal separators
+  var Parts := ANumStr.Split([Fmt.ThousandSeparator]);
+
+  // split out any IEC symbol from last part of split string
+  var LastPart := Parts[High(Parts)];
+  if LastPart.IsEmpty then
+    Exit(False);  // means number ended in decimal separator
+  // collect digits from LastPart
+  var ChIdx: Integer := 1;
+  var Digits := string.Empty;
+  while (ChIdx <= Length(LastPart)) and (LastPart[ChIdx].IsDigit) do
   begin
-    // Number has thousands separate, check format and strip separators
-    var NumStrParts := ANumStr.Split([Fmt.ThousandSeparator]);
-    if not CheckNumParts(NumStrParts) then
-      Exit(False);
-    ANumStr := string.Join('', NumStrParts);
+    Digits := Digits + LastPart[ChIdx];
+    Inc(ChIdx);
   end;
-  Result := TryStrToUInt64(ANumStr, fValue);
+  // replace last part with only digits
+  Parts[High(Parts)] := Digits;
+  // collect any characters that make up IEC symbol
+  var Symbol := string.Empty;
+  while ChIdx <= Length(LastPart) do
+  begin
+    Symbol := Symbol + LastPart[ChIdx];
+    Inc(ChIdx);
+  end;
+
+  // check the number parts if more than 1
+  if (Length(Parts) > 1) and not CheckNumParts(Parts) then
+    Exit(False);
+
+  // recombine and parse the number
+  var NumStr := string.Join('', Parts);
+  var ParsedNumber: UInt64;
+  if not TryStrToUInt64(NumStr, ParsedNumber) then
+    Exit(False);
+
+  // get the bytes multiplier from IEC symbol
+  var Multiplier: UInt64;
+  if Symbol.IsEmpty then
+    Multiplier := 1
+  else if not fIECMap.TryGetValue(Symbol, Multiplier) then
+    Exit(False);
+
+  // calculate number of bytes after applying multiplier
+  if High(UInt64) div Multiplier < ParsedNumber then
+    Exit(False);  // Multiplier * ParsedNumber to big for UInt64!
+  fValue := Multiplier * ParsedNumber;
+  Result := True;
 end;
 
 end.
