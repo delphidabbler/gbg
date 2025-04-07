@@ -29,7 +29,11 @@ type
   strict private
     const
       MaxUnchallengedFileSize = 500 * TMemUnits.OneMB;      // 500,000,000 bytes
+      {$IFDEF Win64}
       MaxSupportedFileSize = 20 * TMemUnits.OneGiB;      // 21,474,836,480 bytes
+      {$ELSE}
+      MaxSupportedFileSize = 1 * TMemUnits.OneGiB;        // 1,073,741,824 bytes
+      {$ENDIF}
     class var
       fParams: TParams;
     class function GetConfirmation(const Question: string;

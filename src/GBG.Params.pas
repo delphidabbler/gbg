@@ -12,9 +12,15 @@ type
     const
       OptionStartChars = ['-', '/'];
       // Maximum random data chunk size
-      // This is calculated as the maximum dynamic array size according to
-      // answers to the Stack Overflow question at https://tinyurl.com/mr3dehxb
+      // For 64 bit version, this is calculated as the maximum dynamic array
+      // size according to answers to the Stack Overflow question at
+      // https://tinyurl.com/mr3dehxb
+      // For 32 bit version, this is limited to 1Gb.
+      {$IFDEF Win64}
       MaxRandomDataChunkSize = MaxInt - 2 * Sizeof(Longint); // 2 GiB - 9 bytes
+      {$ELSE}
+      MaxRandomDataChunkSize = 1 * TMemUnits.OneGiB;
+      {$ENDIF}
     var
       fFileName: string;
       fFileSize: UInt64;
