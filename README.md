@@ -101,7 +101,7 @@ There is no installation program. Simply copy `GBG.xe` or `GBG32.exe` to any fol
 
 To uninstall simply delete the `.exe` file from wherever you copied it to.
 
-:information_source: The program does not alter your Windows installation. It creates no registry entries and does not create any configuration files.
+ℹ️ The program does not alter your Windows installation. It creates no registry entries and does not create any configuration files.
 
 ## Source Code
 
@@ -113,7 +113,7 @@ Contributions are welcome.
 
 The GitFlow methodology is used. Please fork the repository above then create a feature branch off the `develop` branch. When you have made your changes please rebase you branch onto `develop` then submit a [pull request](https://github.com/delphidabbler/gbg/pulls) on GitHub.
 
-> :no_entry: Pull requests that have been branched from `main` will be rejected.
+> ⛔ Pull requests that have been branched from `main` will be rejected.
 
 ## Compiling
 
