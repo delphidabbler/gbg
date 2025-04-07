@@ -4,6 +4,7 @@ interface
 
 uses
   System.SysUtils,
+  GBG.Types,
   GBG.Params;
 
 type
@@ -23,16 +24,9 @@ type
   TMain = class
   strict private
     const
-      TwoPower10 = UInt64(1_024);
-      OneThousand = UInt64(1_000);
-      kB = OneThousand;
-      MB = OneThousand * kB;
-      KiB = TwoPower10;
-      MiB = TwoPower10 * KiB;
-      GiB = TwoPower10 * MiB;
-      BufSize = 10 * MiB;
-      MaxUnchallengedFileSize = 500 * MB;   // 500,000,000 bytes
-      MaxSupportedFileSize = 20 * GiB;      // 21,474,836,480 bytes
+      BufSize = 10 * TMemUnits.OneMiB;
+      MaxUnchallengedFileSize = 500 * TMemUnits.OneMB;      // 500,000,000 bytes
+      MaxSupportedFileSize = 20 * TMemUnits.OneGiB;      // 21,474,836,480 bytes
     class var
       fParams: TParams;
     class procedure FillBufferWithGarbage(var Bytes: TBytes);
@@ -63,8 +57,7 @@ uses
   GBG.Exceptions,
   GBG.Generator.Base,
   GBG.Generator.BinaryGarbage,
-  GBG.NumberFmt,
-  GBG.Types;
+  GBG.NumberFmt;
 
 { TMain }
 
