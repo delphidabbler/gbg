@@ -11,16 +11,6 @@ type
   strict private
     const
       OptionStartChars = ['-', '/'];
-      // Maximum random data chunk size
-      // For 64 bit version, this is calculated as the maximum dynamic array
-      // size according to answers to the Stack Overflow question at
-      // https://tinyurl.com/mr3dehxb
-      // For 32 bit version, this is limited to 1Gb.
-      {$IFDEF Win64}
-      MaxRandomDataChunkSize = MaxInt - 2 * Sizeof(Longint); // 2 GiB - 9 bytes
-      {$ELSE}
-      MaxRandomDataChunkSize = 1 * TMemUnits.OneGiB;
-      {$ENDIF}
     var
       fFileName: string;
       fFileSize: UInt64;
@@ -38,6 +28,16 @@ type
     const
       ///  <summary>Default random data chunk size.</summary>
       DefRandomDataChunkSize = 10 * TMemUnits.OneMiB;
+      // Maximum random data chunk size
+      // For 64 bit version, this is calculated as the maximum dynamic array
+      // size according to answers to the Stack Overflow question at
+      // https://tinyurl.com/mr3dehxb
+      // For 32 bit version, this is limited to 1Gb.
+      {$IFDEF Win64}
+      MaxRandomDataChunkSize = MaxInt - 2 * Sizeof(Longint); // 2 GiB - 9 bytes
+      {$ELSE}
+      MaxRandomDataChunkSize = 1 * TMemUnits.OneGiB;
+      {$ENDIF}
   public
     constructor Create(const AMaxFileSize: UInt64);
     property FileName: string read fFileName;
