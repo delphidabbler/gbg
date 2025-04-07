@@ -32,7 +32,8 @@ implementation
 uses
   System.Character,
   System.Hash,
-  System.Generics.Defaults;
+  System.Generics.Defaults,
+  GBG.Types;
 
 { TNumberFmt }
 
@@ -62,12 +63,12 @@ begin
       end
     )
   );
-  fIECMap.Add('Kb',           1_000); // kilobyte
-  fIECMap.Add('KiB',          1_024); // kibibyte
-  fIECMap.Add('MB',       1_000_000);	// megabyte
-  fIECMap.Add('MiB',      1_048_576); // mebibyte
-  fIECMap.Add('GB',   1_000_000_000); // gigabyte
-  fIECMap.Add('GiB',  1_073_741_824); // gibibyte
+  fIECMap.Add('Kb',  TMemUnits.OneKB);    // kilobyte
+  fIECMap.Add('KiB', TMemUnits.OneKiB);   // kibibyte
+  fIECMap.Add('MB',  TMemUnits.OneMB);	  // megabyte
+  fIECMap.Add('MiB', TMemUnits.OneMiB);   // mebibyte
+  fIECMap.Add('GB',  TMemUnits.OneGB);    // gigabyte
+  fIECMap.Add('GiB', TMemUnits.OneGiB);   // gibibyte
 end;
 
 function TNumberFmt.ToString: string;

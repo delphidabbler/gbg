@@ -4,6 +4,8 @@ interface
 
 uses
   System.SysUtils,
+  System.Classes,
+  GBG.Types,
   GBG.Params;
 
 type
@@ -20,23 +22,16 @@ type
       Unknown = 9;
   end;
 
+  TBufferCallback = reference to procedure (const BytesRemaining: UInt64;
+    out Buffer: TBytes);
+
   TMain = class
   strict private
     const
-      TwoPower10 = UInt64(1_024);
-      OneThousand = UInt64(1_000);
-      kB = OneThousand;
-      MB = OneThousand * kB;
-      KiB = TwoPower10;
-      MiB = TwoPower10 * KiB;
-      GiB = TwoPower10 * MiB;
-      BufSize = 10 * MiB;
-      MaxUnchallengedFileSize = 500 * MB;   // 500,000,000 bytes
-      MaxSupportedFileSize = 20 * GiB;      // 21,474,836,480 bytes
+      MaxUnchallengedFileSize = 500 * TMemUnits.OneMB;      // 500,000,000 bytes
+      MaxSupportedFileSize = 20 * TMemUnits.OneGiB;      // 21,474,836,480 bytes
     class var
       fParams: TParams;
-    class procedure FillBufferWithGarbage(var Bytes: TBytes);
-    class procedure CreateBuffer(out Buffer: TBytes);
     class function GetConfirmation(const Question: string;
       const TrueResponse: Char): Boolean;
     class procedure CheckUserPermissions;
@@ -56,15 +51,13 @@ implementation
 
 uses
   System.IOUtils,
-  System.Classes,
   System.Math,
   System.Character,
   GBG.AppInfo,
+  GBG.DataWriter,
   GBG.Exceptions,
   GBG.Generator.Base,
-  GBG.Generator.BinaryGarbage,
-  GBG.NumberFmt,
-  GBG.Types;
+  GBG.NumberFmt;
 
 { TMain }
 
@@ -109,13 +102,6 @@ begin
   end;
 end;
 
-class procedure TMain.CreateBuffer(out Buffer: TBytes);
-begin
-  SetLength(Buffer, Min(BufSize, fParams.FileSize));
-  if Length(Buffer) > 0 then
-    FillBufferWithGarbage(Buffer);
-end;
-
 class destructor TMain.Destroy;
 begin
   fParams.Free;
@@ -124,40 +110,39 @@ end;
 class procedure TMain.Execute;
 begin
   try
+    // Create output file
     var FS := TFileStream.Create(fParams.FileName, fmCreate);
     try
       if fParams.FileSize = 0 then
-        Exit;
-
-      var Buffer: TBytes;
-      CreateBuffer(Buffer);
-
-      var BytesRemaining := fParams.FileSize;
-      while BytesRemaining > 0 do
-      begin
-        var BytesToWrite: UInt64 := Min(BytesRemaining, UInt64(Length(Buffer)));
-        FS.WriteBuffer(Pointer(Buffer)^, BytesToWrite);
-        Dec(BytesRemaining, BytesToWrite);
+        Exit;   // file size is 0 => close empty file
+      // Create generator of required type
+      var Generator := TGeneratorFactory.CreateInstance(fParams.GeneratorType);
+      try
+        // Create data writer that output the random data
+        var Writer := TDataWriter.Create(FS, Generator);
+        try
+          if fParams.RandomDataChunkSize > 0 then
+            // We want 1 or more chunks of the same random data
+            Writer.WriteDuplicatedChunks(
+              fParams.FileSize, fParams.RandomDataChunkSize
+            )
+          else
+            // We want all data in the file to be random
+            Writer.WriteUniqueData(
+              fParams.FileSize, fParams.DefRandomDataChunkSize
+            );
+        finally
+          Writer.Free;
+        end;
+      finally
+        Generator.Free;
       end;
-
     finally
       FS.Free;
     end;
-
   except
     on E: Exception do
       HandleExecutionException(E);
-  end;
-end;
-
-class procedure TMain.FillBufferWithGarbage(var Bytes: TBytes);
-begin
-  Assert(Length(Bytes) > 0);
-  var Generator := TGeneratorFactory.CreateInstance(fParams.GeneratorType);
-  try
-    Generator.FillBuffer(Bytes);
-  finally
-    Generator.Free;
   end;
 end;
 

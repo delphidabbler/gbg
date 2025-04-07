@@ -11,6 +11,10 @@ type
   strict private
     const
       OptionStartChars = ['-', '/'];
+      // Maximum random data chunk size
+      // This is calculated as the maximum dynamic array size according to
+      // answers to the Stack Overflow question at https://tinyurl.com/mr3dehxb
+      MaxRandomDataChunkSize = MaxInt - 2 * Sizeof(Longint); // 2 GiB - 9 bytes
     var
       fFileName: string;
       fFileSize: UInt64;
@@ -20,8 +24,14 @@ type
       fShowVersion: Boolean;
       fIsFileSizeSet: Boolean;
       fMaxFileSize: UInt64;
+      fRandomDataChunkSize: UInt64;
     function IsOption(const S: string): Boolean;
     procedure ParseCommandLine;
+    procedure ParseRandomDataChunkSizeCommand(const ACmd: string);
+  public
+    const
+      ///  <summary>Default random data chunk size.</summary>
+      DefRandomDataChunkSize = 10 * TMemUnits.OneMiB;
   public
     constructor Create(const AMaxFileSize: UInt64);
     property FileName: string read fFileName;
@@ -30,6 +40,7 @@ type
     property ExistingFileAction: TExistingFileAction read fExistingFileAction;
     property LargeFileAction: TLargeFileAction read fLargeFileAction;
     property ShowVersion: Boolean read fShowVersion;
+    property RandomDataChunkSize: UInt64 read fRandomDataChunkSize;
   end;
 
 implementation
@@ -55,6 +66,7 @@ begin
   fLargeFileAction := TLargeFileAction.Prompt;
   fShowVersion := False;
   fIsFileSizeSet := False;
+  fRandomDataChunkSize := DefRandomDataChunkSize;
   ParseCommandLine;
 end;
 
@@ -96,6 +108,10 @@ begin
       begin
         fLargeFileAction := TLargeFileAction.Allow;
       end
+      else if (Length(Cmd) >= 2) and (Cmd[2] = 'r') then
+      begin
+        ParseRandomDataChunkSizeCommand(Cmd);
+      end
       else if (Length(Cmd) = 2) and (Cmd[2] = 'V') then
         fShowVersion := True
       else
@@ -129,6 +145,31 @@ begin
   end
   else if (fFileName = '') or not fIsFileSizeSet then
     raise EUsageError.Create('A file name and a file size are required');
+end;
+
+procedure TParams.ParseRandomDataChunkSizeCommand(const ACmd: string);
+
+  procedure Error(const AMsg: string);
+  begin
+    raise EUsageError.CreateFmt('Malformed -r option: %s', [AMsg]);
+  end;
+
+begin
+  // Format of this command is "-r:" <size> where <size> is a number that
+  // may contain thousand separators and end with an IEC symbol
+  // Alternatively, the whole file can be specified using "-r:all"
+  Assert((ACmd.Length >= 2) and (ACmd[2] = 'r'), 'Invalid ACmd: ' + ACmd);
+  if (ACmd.Length < 3) or (ACmd[3] <> ':') then
+    Error('missing colon after -r');
+  if (ACmd.Length < 4) then
+    Error('no size specified after -r:');
+  var SizeStr: string := ACmd.Substring(3);  // zero based index
+  if SizeStr = 'all' then
+    fRandomDataChunkSize := 0   // special value meaning "whole file"
+  else if not TNumberFmt.TryParse(SizeStr, fRandomDataChunkSize) then
+    Error(Format('invalid size "%s"', [SizeStr]));
+  if fRandomDataChunkSize > MaxRandomDataChunkSize then
+    Error('random data chunk size is too large');
 end;
 
 end.
