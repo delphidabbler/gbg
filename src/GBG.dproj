@@ -162,6 +162,7 @@ $(PreBuildEvent)]]></PreBuildEvent>
         <DCCReference Include="GBG.Types.pas"/>
         <DCCReference Include="GBG.Generator.ASCIIGarbage.pas"/>
         <DCCReference Include="GBG.AppInfo.pas"/>
+        <DCCReference Include="GBG.DataWriter.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -204,7 +205,20 @@ $(PreBuildEvent)]]></PreBuildEvent>
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="..\_build\Win64\Debug\exe\GBG.exe" Configuration="Debug" Class="ProjectOutput"/>
+                <DeployFile LocalName="..\_build\Win64\Debug\exe\GBG.exe" Configuration="Debug" Class="ProjectOutput">
+                    <Platform Name="Win64">
+                        <RemoteName>GBG.exe</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
                 <DeployFile LocalName="..\_build\Win64\Debug\exe\GBG.rsm" Configuration="Debug" Class="DebugSymbols"/>
+                <DeployFile LocalName="..\_build\Win64\Debug\exe\GBG.rsm" Configuration="Debug" Class="DebugSymbols">
+                    <Platform Name="Win64">
+                        <RemoteName>GBG.rsm</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Win32\Debug\GBG.exe" Configuration="Debug" Class="ProjectOutput"/>
                 <DeployFile LocalName="Win32\Debug\GBG.exe" Configuration="Debug" Class="ProjectOutput"/>
                 <DeployClass Name="AdditionalDebugSymbols">
                     <Platform Name="iOSSimulator">

@@ -32,10 +32,6 @@ type
       MaxSupportedFileSize = 20 * TMemUnits.OneGiB;      // 21,474,836,480 bytes
     class var
       fParams: TParams;
-    class procedure FillBufferWithGarbage(var Bytes: TBytes);
-    class procedure CreateBuffer(const BufferSize: UInt64; out Buffer: TBytes);
-    class procedure WriteBytes(const FS: TFileStream; const ByteCount: UInt64;
-      NextBuffer: TBufferCallback);
     class function GetConfirmation(const Question: string;
       const TrueResponse: Char): Boolean;
     class procedure CheckUserPermissions;
@@ -58,9 +54,9 @@ uses
   System.Math,
   System.Character,
   GBG.AppInfo,
+  GBG.DataWriter,
   GBG.Exceptions,
   GBG.Generator.Base,
-  GBG.Generator.BinaryGarbage,
   GBG.NumberFmt;
 
 { TMain }
@@ -106,14 +102,6 @@ begin
   end;
 end;
 
-class procedure TMain.CreateBuffer(const BufferSize: UInt64;
-  out Buffer: TBytes);
-begin
-  SetLength(Buffer, Min(BufferSize, fParams.FileSize));
-  if Length(Buffer) > 0 then
-    FillBufferWithGarbage(Buffer);
-end;
-
 class destructor TMain.Destroy;
 begin
   fParams.Free;
@@ -122,63 +110,39 @@ end;
 class procedure TMain.Execute;
 begin
   try
+    // Create output file
     var FS := TFileStream.Create(fParams.FileName, fmCreate);
     try
       if fParams.FileSize = 0 then
-        Exit;
-
-      var GarbageBuffer: TBytes;
-
-      if fParams.RandomDataChunkSize > 0 then
-      begin
-        // We reuse the same buffer of random bytes as many times as required
-        // Generate a buffer
-        CreateBuffer(
-          Min(fParams.RandomDataChunkSize, fParams.FileSize), GarbageBuffer
-        );
-        WriteBytes(
-          FS,
-          fParams.FileSize,
-          procedure (const BytesRemaining: UInt64; out Buffer: TBytes)
-          begin
-            Buffer := GarbageBuffer;
-          end
-        );
-      end
-      else
-      begin
-        // No blocks of bytes are re-used: the whole file is random. To do this
-        // we generate new buffer of random data each time the buffer is
-        // required
-        WriteBytes(
-          FS,
-          fParams.FileSize,
-          procedure (const BytesRemaining: UInt64; out Buffer: TBytes)
-          begin
-            CreateBuffer(
-              Min(fParams.DefRandomDataChunkSize, BytesRemaining), Buffer
+        Exit;   // file size is 0 => close empty file
+      // Create generator of required type
+      var Generator := TGeneratorFactory.CreateInstance(fParams.GeneratorType);
+      try
+        // Create data writer that output the random data
+        var Writer := TDataWriter.Create(FS, Generator);
+        try
+          if fParams.RandomDataChunkSize > 0 then
+            // We want 1 or more chunks of the same random data
+            Writer.WriteDuplicatedChunks(
+              fParams.FileSize, fParams.RandomDataChunkSize
+            )
+          else
+            // We want all data in the file to be random
+            Writer.WriteUniqueData(
+              fParams.FileSize, fParams.DefRandomDataChunkSize
             );
-          end
-        );
+        finally
+          Writer.Free;
+        end;
+      finally
+        Generator.Free;
       end;
     finally
       FS.Free;
     end;
-
   except
     on E: Exception do
       HandleExecutionException(E);
-  end;
-end;
-
-class procedure TMain.FillBufferWithGarbage(var Bytes: TBytes);
-begin
-  Assert(Length(Bytes) > 0);
-  var Generator := TGeneratorFactory.CreateInstance(fParams.GeneratorType);
-  try
-    Generator.FillBuffer(Bytes);
-  finally
-    Generator.Free;
   end;
 end;
 
@@ -326,21 +290,6 @@ begin
   WriteLn(
     Format('%s %s ', [TAppInfo.ProgramVersion, TAppInfo.ProgramExeDate])
   );
-end;
-
-class procedure TMain.WriteBytes(const FS: TFileStream; const ByteCount: UInt64;
-  NextBuffer: TBufferCallback);
-var
-  Buffer: TBytes;
-begin
-  var BytesRemaining := ByteCount;
-  while BytesRemaining > 0 do
-  begin
-    NextBuffer(BytesRemaining, Buffer);
-    var BytesToWrite: UInt64 := Min(BytesRemaining, UInt64(Length(Buffer)));
-    FS.WriteBuffer(Pointer(Buffer)^, BytesToWrite);
-    Dec(BytesRemaining, BytesToWrite);
-  end;
 end;
 
 end.

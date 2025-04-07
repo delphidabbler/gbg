@@ -15,7 +15,8 @@ uses
   GBG.Exceptions in 'GBG.Exceptions.pas',
   GBG.Types in 'GBG.Types.pas',
   GBG.Generator.ASCIIGarbage in 'GBG.Generator.ASCIIGarbage.pas',
-  GBG.AppInfo in 'GBG.AppInfo.pas';
+  GBG.AppInfo in 'GBG.AppInfo.pas',
+  GBG.DataWriter in 'GBG.DataWriter.pas';
 
 begin
   {$IFDEF DEBUG}
