@@ -117,7 +117,7 @@ The GitFlow methodology is used. Please fork the repository above then create a 
 
 ## Compiling
 
-_gbg_ is compiled using Delphi 12.1. Delphi 11 may work, but has not been tested.
+_gbg_ is compiled using Delphi 12.2. Delphi 11 and earlier are not suitable.
 
 The program can be compiled from the Delphi IDE as 32 bit or 64 bit Windows targets and as either Debug or Release builds. Just choose the appropriate target platform and build configuration in the IDE before building.
 
