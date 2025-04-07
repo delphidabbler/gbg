@@ -37,6 +37,7 @@ implementation
 uses
   System.SysUtils,
   System.Character,
+  System.Math,
 
   GBG.Exceptions,
   GBG.NumberFmt;
@@ -107,6 +108,10 @@ begin
       else if not fIsFileSizeSet then
       begin
         if not TNumberFmt.TryParse(Cmd, fFileSize) then
+          raise EUsageError.CreateFmt(
+            'Invalid file size. Malformed number: "%s"', [Cmd]
+          );
+        if not InRange(fFileSize, 0, fMaxFileSize) then
           raise EUsageError.CreateFmt(
             'Invalid file size. Must be a whole number in range 0 to %s',
             [TNumberFmt.Create(fMaxFileSize).ToString]
