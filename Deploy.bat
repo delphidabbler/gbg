@@ -49,7 +49,7 @@ set ProjectName=GBG
 set Exe32=%ProjectName%32.exe
 set Exe64=%ProjectName%.exe
 set ReadMe=%ReleaseDir%\README.txt
-set WebDocs=https://github.com/delphidabbler/gbg/blob/main/README.md
+set WebDocs=https://github.com/ddabapps/gbg/blob/main/README.md
 
 :: Make a clean directory structure
 if exist %BuildRoot% rmdir /S /Q %BuildRoot%

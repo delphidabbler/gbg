@@ -89,7 +89,7 @@ If the given file already exists the user is asked to confirm that the file can 
 
 ## Installing & Uninstalling
 
-_gbg_ can be downloaded from the project's [Releases page](https://github.com/delphidabbler/gbg/releases) on GitHub. The download for each release is named `gbg-exe-<version>.zip`, where `<version>` represents the release version number. 
+_gbg_ can be downloaded from the project's [Releases page](https://github.com/ddabapps/gbg/releases) on GitHub. The download for each release is named `gbg-exe-<version>.zip`, where `<version>` represents the release version number. 
 
 The zip file contains:
 
@@ -105,13 +105,13 @@ To uninstall simply delete the `.exe` file from wherever you copied it to.
 
 ## Source Code
 
-Full source code is available from the [delphidabbler/gbg](https://github.com/delphidabbler/gbg) project on GitHub.
+Full source code is available from the [ddabapps/gbg](https://github.com/ddabapps/gbg) project on GitHub.
 
 ## Contributing
 
 Contributions are welcome.
 
-The GitFlow methodology is used. Please fork the repository above then create a feature branch off the `develop` branch. When you have made your changes please rebase your branch onto `develop` then submit a [pull request](https://github.com/delphidabbler/gbg/pulls) on GitHub.
+The GitFlow methodology is used. Please fork the repository above then create a feature branch off the `develop` branch. When you have made your changes please rebase your branch onto `develop` then submit a [pull request](https://github.com/ddabapps/gbg/pulls) on GitHub.
 
 > ⛔ Pull requests that have been branched from `main` will be rejected.
 
@@ -127,7 +127,7 @@ Releases are built by calling `Deploy.bat`. See the comments in the file for usa
 
 ## Bugs and Feature requests
 
-To suggest new features or report bugs use the _gbg_ [Issues page](https://github.com/delphidabbler/gbg/issues) on GitHub.
+To suggest new features or report bugs use the _gbg_ [Issues page](https://github.com/ddabapps/gbg/issues) on GitHub.
 
 ## License
 
